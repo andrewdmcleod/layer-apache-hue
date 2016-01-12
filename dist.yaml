@@ -1,0 +1,24 @@
+
+# This file contains values that are likely to change per distribution.
+# The aim is to make it easier to update / extend the charms with
+# minimal changes to the shared code in the jujubigdata library.
+hadoop_version: '2.7.1'
+groups:
+    - 'hadoop'
+users:
+    hue:
+        groups: ['hadoop']
+dirs:
+    hadoop:
+        path: '/usr/lib/hadoop'
+        perms: 0777
+    hue:
+        path: '/usr/lib/hue'
+        owner: 'hue'
+        group: 'hadoop'
+    outputdir:
+        path: '/hue/work'
+ports:
+  hue_web:
+    port: 8888
+    exposed_on: 'hue'
