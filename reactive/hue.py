@@ -1,11 +1,10 @@
-import jujuresources
+#import jujuresources
 from charms.reactive import when, when_not
-from charms.reactive import set_state, remove_state, is_state
+from charms.reactive import set_state
 from charmhelpers.core import hookenv
-from charms.hadoop import get_hadoop_base
-from jujubigdata import utils
-from charmhelpers.fetch import apt_install
-from subprocess import check_call
+#from jujubigdata import utils
+#from charmhelpers.fetch import apt_install
+#from subprocess import check_call
 from charms.hue import Hue
 
 DIST_KEYS = ['hadoop_version', 'groups', 'users', 'dirs', 'ports']
@@ -67,7 +66,10 @@ def configure_hue(*args):
 @when_not('hue.started')
 def start_hue(*args):
     hookenv.status_set('maintenance', 'Setting up Hue')
-    hue = Hue(get_dist_config(DIST_KEYS))
+    hue = get_dist_config(DIST_KEYS)
+    hue_port = hue.port('hue_web')
+    #hookenv.log("Hue port is: " +str(hue_port))
+    hookenv.open_port(hue_port)
     # start it!
     set_state('hue.started')
     hookenv.status_set('active', 'Ready')
