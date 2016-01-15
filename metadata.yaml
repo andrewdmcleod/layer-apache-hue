@@ -7,14 +7,8 @@ description: |
   Hue.
 tags: [bigdata, hadoop]
 requires:
-  resourcemanager:
-    interface: mapred
-  namenode:
-    interface: dfs
   hive:
     interface: hive
-  hdfs:
-    interface: hdfs
 provides:
   hadoop:
     interface: hadoop-plugin

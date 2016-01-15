@@ -71,10 +71,18 @@ class Hue(object):
         with utils.xmlpropmap_edit_in_place(hadoop_conf) as props:
             hdfs_endpoint = props['fs.defaultFS']
 
-        hue_config_template = ''.join((self.dist_config.path('hue'), '/conf/hue-mapreduce.properties.template'))
-        hue_config = ''.join((self.dist_config.path('hue'), '/conf/hue-mapreduce.properties'))
-        copy(hue_config_template, hue_config)
-        
+        default_conf = self.dist_config.path('hue') / 'desktop/conf'
+        hue_conf = self.dist_config.path('hue_conf')
+        hue_conf.rmtree_p()
+        default_conf.copytree(hue_conf)
+        # Now remove the conf included in the tarball and symlink our real conf
+        default_conf.rmtree_p()
+        hue_conf.symlink(default_conf)
+
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
+        hue_port = self.dist_config.port('hue_web')
+
         utils.re_edit_in_place(hue_config, {
-                r'fs.uri=hdfs://localhost:8020': 'fs.uri=%s' % hdfs_endpoint,                
-                })
+            r'http_port=8888': 'http_port=%s' % hue_port,
+            r'fs.uri=hdfs://localhost:8020': 'fs.uri=%s' % hdfs_endpoint,                
+            })

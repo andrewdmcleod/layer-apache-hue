@@ -4,7 +4,7 @@ resources:
   pathlib:
     pypi: path.py>=7.0
   jujubigdata:
-    pypi: jujubigdata>=4.0.0,<6.0.0
+    pypi: jujubigdata>=5.0.0,<6.0.0
     #pypi: git+https://github.com/ktsakalozos/jujubigdata.git#egg=jujubigdata
     skip_hash: true
 optional_resources:

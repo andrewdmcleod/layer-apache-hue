@@ -1,1 +1,1 @@
-includes: ['layer:bigdata', 'interface:hadoop-plugin', 'interface:hdfs']
+includes: ['layer:hadoop-client']

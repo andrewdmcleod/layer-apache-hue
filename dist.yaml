@@ -18,7 +18,9 @@ dirs:
         group: 'hadoop'
     outputdir:
         path: '/hue/work'
+    hue_conf:
+        path: '/etc/hue/conf' 
 ports:
   hue_web:
-    port: 8888
+    port: 8000
     exposed_on: 'hue'
