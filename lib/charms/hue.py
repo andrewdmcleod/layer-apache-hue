@@ -88,6 +88,9 @@ class Hue(object):
         default_conf.rmtree_p()
         hue_conf.symlink(default_conf)
 
+        hdfs_fulluri = hdfs_endpoint.split('/')[2]
+        hdfs_hostname = hdfs_fulluri.split(':')[0]
+
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         hue_port = self.dist_config.port('hue_web')
         utils.re_edit_in_place(hue_config, {
@@ -95,5 +98,7 @@ class Hue(object):
             r'fs_defaultfs=hdfs://localhost:8020': 'fs_defaults=%s' % hdfs_endpoint,
             r'## resourcemanager_host=localhost': 'resourcemanager_host=%s' % yarn_resmgr.split(':')[0],
             r'## resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_resmgr.split(':')[1],
-            #r'## history_server_api_url=http://localhost:19888': '## history_server_api_url=http://localhost:19888
+            r'## webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % hdfs_hostname,
+            r'## history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
+            r'## resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
             })
