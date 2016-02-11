@@ -9,6 +9,8 @@ tags: [bigdata, hadoop]
 requires:
   hive:
     interface: hive
+  oozie:
+    interface: oozie
 provides:
   hadoop:
     interface: hadoop-plugin

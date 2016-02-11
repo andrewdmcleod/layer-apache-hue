@@ -1,1 +1,25 @@
-includes: ['layer:hadoop-client']
+includes: ['layer:hadoop-client', 'interface:oozie', 'interface:hadoop-plugin', 'interface:hive']
+options:
+  hadoop-client:
+    hadoop_version: '2.7.1'
+    groups:
+        - 'hadoop'
+    users:
+        hue:
+            groups: ['hadoop']
+    dirs:
+        hadoop:
+            path: '/usr/lib/hadoop'
+            perms: 0777
+        hue:
+            path: '/usr/lib/hue'
+            owner: 'hue'
+            group: 'hadoop'
+        outputdir:
+            path: '/hue/work'
+        hue_conf:
+            path: '/etc/hue/conf'
+    ports:
+      hue_web:
+        port: 8000
+        exposed_on: 'hue'
