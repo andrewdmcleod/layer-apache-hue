@@ -7,7 +7,7 @@ description: |
   Hue.
 tags: [bigdata, hadoop]
 requires:
-  hive:
+  client:
     interface: hive
   oozie:
     interface: oozie
