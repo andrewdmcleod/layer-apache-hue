@@ -78,8 +78,8 @@ def missing_hive():
     hookenv.status_set('waiting', 'Waiting for relation to Hive')
         
 
-@when('hue.started', 'hive.joined')
-@when_not('hive.ready')
+@when('hue.started')
+@when_not('hive.joined')
 def waiting_hive(hive):
     hookenv.status_set('waiting', 'Waiting for Hive to be available')
 
