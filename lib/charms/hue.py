@@ -130,9 +130,11 @@ class Hue(object):
 
     def configure_hive(self, hostname, port):
         hookenv.log("configuring hive connection...")
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'## hive_server_host=localhost': 'hive_server_host=%s' % hostname,
             r'## hive_server_port=10000': 'hive_server_port=%s' % port
+            })
           
 
     def configure_oozie(self):
