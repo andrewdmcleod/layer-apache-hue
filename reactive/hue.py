@@ -1,5 +1,5 @@
 #import jujuresources
-from charms.reactive import when, when_not
+from charms.reactive import when, when_not, when_file_changed
 from charms.reactive import set_state, remove_state
 from charmhelpers.core import hookenv
 #from jujubigdata import utils
@@ -90,13 +90,15 @@ def configure_hive(hive):
     hue = Hue(dist)
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
+    hue.configure_hive(hive_host, hive_port)
     hookenv.log("HIVE Hostname and port: " + hive_host + ":" + str(hive_port))
 
-#@when('hue.started')
-#@when_file_changed('/hue.ini.location')
-#def restart_hue():
-#    hue.stop()
-#    hue.start()
+@when('hue.started')
+@when_file_changed('/etc/hue/conf/hue.ini')
+def restart_hue():
+    hue = Hue(dist)
+    hue.stop()
+    hue.start()
 
 
 #@when('hue.started')
