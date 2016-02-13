@@ -16,10 +16,6 @@ dirs:
         path: '/usr/lib/hue'
         owner: 'hue'
         group: 'hadoop'
-    hue_log:
-        path: '/var/log/hue/'
-        owner: 'hue'
-        group: 'hadoop' 
     outputdir:
         path: '/hue/work'
     hue_conf:
