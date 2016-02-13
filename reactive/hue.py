@@ -96,6 +96,7 @@ def configure_hive(hive):
 @when('hue.started')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
+    dist = get_dist_config()
     hue = Hue(dist)
     hue.stop()
     hue.start()
