@@ -18,6 +18,9 @@ from charms.hadoop import get_dist_config
 #    return get_dist_config.value
 
 
+#Define services that should relate to hue below
+HUE_RELS = ['hive', 'oozie', 'impala', 'spark']
+
 @when_not('hadoop.related')
 def missing_hadoop():
     hookenv.status_set('blocked', 'Waiting for relation to Hadoop Plugin')
@@ -67,22 +70,19 @@ def start_hue(hadoop):
     hookenv.status_set('maintenance', 'Setting up Hue')
     hue = Hue(get_dist_config())
     hue.open_ports()
-    # start it!
+    hue.start_hue()
     set_state('hue.started')
     hookenv.status_set('active', 'Ready')
 
 
 @when('hue.started')
-@when_not('hive.joined')
-def missing_hive():
-    hookenv.status_set('waiting', 'Waiting for relation to Hive')
+def need_relations():
+    wait_rels = ', '.join(HUE_RELS)
+    if len(wait_rels) > 0:
+        hookenv.status_set('waiting', 'Waiting for relations: ' + str(wait_rels))
+    else:
+        hookenv.status_set('active', 'Ready')
         
-
-#@when('hue.started')
-#@when_not('hive.joined')
-#def waiting_hive(hive):
-#    hookenv.status_set('waiting', 'Waiting for Hive to be available')
-
 
 @when('hue.started', 'hive.joined')
 def configure_hive(hive):
@@ -90,17 +90,29 @@ def configure_hive(hive):
     hue = Hue(dist)
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
+    HUE_RELS.remove('hive')
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
-    hookenv.log("HIVE Hostname and port: " + hive_host + ":" + str(hive_port))
 
 @when('hue.started', 'hue.configured')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
     dist = get_dist_config()
+    HUE_RELS.append('hive')
     hue = Hue(dist)
     hue.stop_hue()
     hue.start_hue()
+
+
+@when('hue.started', 'oozie.joined')
+def configure_oozie(oozie):
+    dist = get_dist_config()
+    hue = Hue(dist)
+    oozie_host = oozie.get_hostname()
+    oozie_port = oozie.get_port()
+    HUE_RELS.remove('oozie'
+    if oozie_port:
+        hue.configure_oozie(oozie_host, oozie_port)
 
 
 #@when('hue.started')
