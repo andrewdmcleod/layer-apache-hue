@@ -124,7 +124,8 @@ class Hue(object):
 
     def start_hue(self):
         hookenv.log("starting hue somehow...")
-        utils.run_as('ubuntu', '/usr/lib/hue/build/env/bin/supervisor', '-d')
+        hue_log = self.dist_config.path('hue_log')
+        utils.run_as('ubuntu', '/usr/lib/hue/build/env/bin/supervisor', '-l', hue_log, '-d')
 
     def stop_hue(self):
         hookenv.log("stopping hue somehow...")
