@@ -135,8 +135,8 @@ class Hue(object):
         hookenv.log("configuring hive connection...")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
-            r'.* hive_server_host=localhost': 'hive_server_host=%s' % hostname,
-            r'.* hive_server_port *=.*': 'hive_server_port=%s' % port
+            r'.* hive_server_host=localhost': '  hive_server_host=%s' % hostname,
+            r'.* hive_server_port *=.*': '  hive_server_port=%s' % port
             })
           
 
