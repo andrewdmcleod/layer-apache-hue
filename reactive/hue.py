@@ -85,7 +85,7 @@ def restart_hue():
     hue.start_hue()
 
 
-@@when('hue.started')
+@when('hue.started')
 def need_relations():
     wait_rels = ', '.join(HUE_RELS)
     if len(wait_rels) > 0:
