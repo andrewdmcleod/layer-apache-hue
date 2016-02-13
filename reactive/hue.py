@@ -75,7 +75,17 @@ def start_hue(hadoop):
     hookenv.status_set('active', 'Ready')
 
 
-@when('hue.started')
+@when('hue.started', 'hue.configured')
+@when_file_changed('/etc/hue/conf/hue.ini')
+def restart_hue():
+    dist = get_dist_config()
+    HUE_RELS.append('hive')
+    hue = Hue(dist)
+    hue.stop_hue()
+    hue.start_hue()
+
+
+@@when('hue.started')
 def need_relations():
     wait_rels = ', '.join(HUE_RELS)
     if len(wait_rels) > 0:
@@ -93,16 +103,6 @@ def configure_hive(hive):
     HUE_RELS.remove('hive')
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
-
-
-@when('hue.started', 'hue.configured')
-@when_file_changed('/etc/hue/conf/hue.ini')
-def restart_hue():
-    dist = get_dist_config()
-    HUE_RELS.append('hive')
-    hue = Hue(dist)
-    hue.stop_hue()
-    hue.start_hue()
 
 
 @when('hue.started', 'oozie.joined')
