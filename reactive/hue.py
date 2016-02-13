@@ -90,7 +90,8 @@ def configure_hive(hive):
     hue = Hue(dist)
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
-    hue.configure_hive(hive_host, hive_port)
+    if hive_port:
+        hue.configure_hive(hive_host, hive_port)
     hookenv.log("HIVE Hostname and port: " + hive_host + ":" + str(hive_port))
 
 @when('hue.started')
