@@ -79,7 +79,6 @@ def start_hue(hadoop):
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
     dist = get_dist_config()
-    HUE_RELS.append('hive')
     hue = Hue(dist)
     hue.stop_hue()
     hue.start_hue()
@@ -100,11 +99,16 @@ def configure_hive(hive):
     hue = Hue(dist)
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
-    HUE_RELS.remove('hive')
+    HUE_RELS.append('hive')
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
 
-
+@when('hue.started')
+@when_not('hive.joined')
+def depart_hive():
+    if not 'hive' in HUE_RELS:
+        HUE_RELS.append('hive')
+    
 @when('hue.started', 'oozie.joined')
 def configure_oozie(oozie):
     dist = get_dist_config()
