@@ -124,9 +124,11 @@ class Hue(object):
 
     def start_hue(self):
         hookenv.log("starting hue somehow...")
+        utils.run_as('ubuntu', '/usr/lib/hue/build/env/bin/supervisor', '-d')
 
     def stop_hue(self):
         hookenv.log("stopping hue somehow...")
+        utils.run_as('ubuntu', 'pkill', '-9', 'supervisor')
 
     def configure_hive(self, hostname, port):
         hookenv.log("configuring hive connection...")
