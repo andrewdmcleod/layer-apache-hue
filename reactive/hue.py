@@ -94,6 +94,7 @@ def configure_hive(hive):
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
 
+
 @when('hue.started', 'hue.configured')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
@@ -110,7 +111,7 @@ def configure_oozie(oozie):
     hue = Hue(dist)
     oozie_host = oozie.get_hostname()
     oozie_port = oozie.get_port()
-    HUE_RELS.remove('oozie'
+    HUE_RELS.remove('oozie')
     if oozie_port:
         hue.configure_oozie(oozie_host, oozie_port)
 
