@@ -22,5 +22,5 @@ dirs:
         path: '/etc/hue/conf' 
 ports:
   hue_web:
-    port: 8000
+    port: 8888 
     exposed_on: 'hue'

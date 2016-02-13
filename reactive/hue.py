@@ -94,13 +94,13 @@ def configure_hive(hive):
         hue.configure_hive(hive_host, hive_port)
     hookenv.log("HIVE Hostname and port: " + hive_host + ":" + str(hive_port))
 
-@when('hue.started')
+@when('hue.started', 'hue.configured')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
     dist = get_dist_config()
     hue = Hue(dist)
-    hue.stop()
-    hue.start()
+    hue.stop_hue()
+    hue.start_hue()
 
 
 #@when('hue.started')

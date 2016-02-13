@@ -106,12 +106,12 @@ class Hue(object):
             #r'fs_defaultfs=hdfs://localhost:8020': 'fs_defaultfs=%s' % hdfs_endpoint,
             r'fs_defaultfs=hdfs://localhost:8020': 'fs_defaultfs=%s:%s' % (namenodes[0], hdfs_port),
             #r'## resourcemanager_host=localhost': 'resourcemanager_host=%s' % yarn_resmgr.split(':')[0],
-            r'## resourcemanager_host=localhost': 'resourcemanager_host=%s' % resourcemanagers[0],
+            r'.* resourcemanager_host=localhost': 'resourcemanager_host=%s' % resourcemanagers[0],
             #r'## resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_resmgr.split(':')[1],
-            r'## resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_port,
-            r'## webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
-            r'## history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
-            r'## resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
+            r'.* resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_port,
+            r'.* webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
+            r'.* history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
+            r'.* resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
             })
 
     def open_ports(self):
@@ -132,8 +132,8 @@ class Hue(object):
         hookenv.log("configuring hive connection...")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
-            r'## hive_server_host=localhost': 'hive_server_host=%s' % hostname,
-            r'## hive_server_port=10000': 'hive_server_port=%s' % port
+            r'.* hive_server_host=localhost': 'hive_server_host=%s' % hostname,
+            r'.* hive_server_port *=.*': 'hive_server_port=%s' % port
             })
           
 
