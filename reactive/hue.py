@@ -1,7 +1,7 @@
 #import jujuresources
 from charms.reactive import when, when_not, when_file_changed
 from charms.reactive import set_state, remove_state
-from charms.reactive.bus import get_state
+from charms.reactive.bus import get_states
 from charmhelpers.core import hookenv
 #from jujubigdata import utils
 #from charmhelpers.fetch import apt_install
@@ -76,7 +76,7 @@ def start_hue(hadoop):
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
     # Can't seem to mix @when_file_changed and @when...
-    if get_state('hue.started'):
+    if 'hue.started' in get_states():
         hue.restart()
     else:
         return
@@ -86,7 +86,7 @@ def restart_hue():
 def configure_hive(hive):
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
-    hue.relations(joined='Hive')
+    hue.check_relations()
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
     set_state('hive.configured')
@@ -97,7 +97,7 @@ def configure_hive(hive):
 def configure_spark(spark):
     spark_host = spark.get_hostname()
     spark_port = spark.get_port()
-    hue.relations(joined='Spark')
+    hue.check_relations()
     if spark_port:
         hue.configure_spark(spark_host, spark_port)
     set_state('spark.configured')
@@ -108,7 +108,7 @@ def configure_spark(spark):
 def configure_oozie(oozie):
     oozie_host = oozie.get_hostname()
     oozie_port = oozie.get_port()
-    hue.relations(joined='Oozie')
+    hue.check_relations()
     if oozie_port:
         hue.configure_oozie(oozie_host, oozie_port)
     set_state('oozie.configured')
@@ -117,21 +117,21 @@ def configure_oozie(oozie):
 @when('hue.started')
 @when_not('hive.joined')
 def depart_hive():
-    hue.relations(departed='Hive')
+    hue.check_relations()
     remove_state('hive.configured')
 
 
 @when('hue.started')
 @when_not('oozie.joined')
 def depart_oozie():
-    hue.relations(departed='Oozie')
+    hue.check_relations()
     remove_state('oozie.configured')
 
 
 @when('hue.started')
 @when_not('spark.joined')
 def depart_spark():
-    hue.relations(departed='Spark')
+    hue.check_relations()
     remove_state('spark.configured')
 
 
