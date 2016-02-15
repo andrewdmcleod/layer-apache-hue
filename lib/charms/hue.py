@@ -1,6 +1,7 @@
 import jujuresources
 from jujubigdata import utils
 from charmhelpers.core import unitdata, hookenv
+from charms.reactive.bus import get_states
 from charmhelpers import fetch
 from shutil import copy, copyfile
 import os
@@ -57,29 +58,34 @@ class Hue(object):
         utils.run_as('root', 'chown', '-R', 'hue:hadoop', self.dist_config.path('hue'))
         unitdata.kv().set('hue.installed', True)
         
-        # Following could be moved into layer options
-        unitdata.kv().set('hue.rels', ['Hive', 'Oozie', 'Spark'])
-        unitdata.kv().flush(True)
-
     def relations(self, joined=None, departed=None):
-        unitdata.kv().flush(True)
-        rels = unitdata.kv().get('hue.rels')
-        if joined:
-            if joined not in rels:
-                return
-            else:
-                rels.remove(joined)
-                unitdata.kv().set('hue.rels', rels)
-        if departed:
-            if departed in rels:
-                return
-            else:
-                rels.append(departed)
-                unitdata.kv().set('hue.rels', rels)
-        unitdata.kv().flush(True)
-        rels = unitdata.kv().get('hue.rels')
-        wait_rels = ', '.join(rels)
-        if len(rels) > 0:
+        # Following could be moved into layer options
+        required_relations = ['Hive', 'Oozie', 'Spark']
+        current_relations = required_relations
+        all_states = get_states()
+        for k, v in all_states.iteritems():
+            if "joined" in k:
+                relname = k.split('.')[0]
+                if relname in required_relations:
+                    current_relations.remove(relname)
+                
+        #if joined:
+        #    if joined not in rels:
+        #        return
+        #    else:
+        #        rels.remove(joined)
+        #        unitdata.kv().set('hue.rels', rels)
+        #if departed:
+        #    if departed in rels:
+        #        return
+        #    else:
+        #        rels.append(departed)
+        #        unitdata.kv().set('hue.rels', rels)
+        #unitdata.kv().flush(True)
+        #rels = unitdata.kv().get('hue.rels')
+
+        wait_rels = ', '.join(current_relations)
+        if len(current_relations) > 0:
             hookenv.status_set('waiting', 'Waiting for relations: ' + str(wait_rels))
         else:
             hookenv.status_set('active', 'Ready')

@@ -1,6 +1,7 @@
 #import jujuresources
 from charms.reactive import when, when_not, when_file_changed
 from charms.reactive import set_state, remove_state
+from charms.reactive.bus import get_state
 from charmhelpers.core import hookenv
 #from jujubigdata import utils
 #from charmhelpers.fetch import apt_install
@@ -72,11 +73,13 @@ def start_hue(hadoop):
     hookenv.status_set('active', 'Ready')
 
 
-@when('hue.started')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
-    hue.restart()
-
+    # Can't seem to mix @when_file_changed and @when...
+    if get_state('hue.started'):
+        hue.restart()
+    else:
+        return
 
 @when('hue.started', 'hive.joined')
 @when_not('hive.configured')
