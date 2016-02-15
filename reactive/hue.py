@@ -75,7 +75,7 @@ def start_hue(hadoop):
 
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
-    # Can't seem to mix @when_file_changed and @when...
+    # Can't seem to mix @when_file_changed and @when('hue.started')
     if 'hue.started' in get_states():
         hue.restart()
     else:
