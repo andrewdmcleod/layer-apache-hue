@@ -149,7 +149,7 @@ class Hue(object):
 
     def start(self):
         self.stop_hue()
-        hookenv.log("Starting HUE with Supervisor process"
+        hookenv.log("Starting HUE with Supervisor process")
         hue_log = self.dist_config.path('hue_log')
         utils.run_as('hue', '/usr/lib/hue/build/env/bin/supervisor', '-l', hue_log, '-d')
 
