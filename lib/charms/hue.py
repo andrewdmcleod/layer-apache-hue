@@ -131,12 +131,12 @@ class Hue(object):
             #r'fs_defaultfs=hdfs://localhost:8020': 'fs_defaultfs=%s' % hdfs_endpoint,
             r'fs_defaultfs=hdfs://localhost:8020': 'fs_defaultfs=%s:%s' % (namenodes[0], hdfs_port),
             #r'## resourcemanager_host=localhost': 'resourcemanager_host=%s' % yarn_resmgr.split(':')[0],
-            r'.* resourcemanager_host=localhost': 'resourcemanager_host=%s' % resourcemanagers[0],
+            r'.* resourcemanager_host=localhost': '  resourcemanager_host=%s' % resourcemanagers[0],
             #r'## resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_resmgr.split(':')[1],
-            r'.* resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_port,
-            r'.* webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
-            r'.* history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
-            r'.* resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
+            r'.* resourcemanager_port=8032': '  resourcemanager_port=%s' % yarn_port,
+            r'.* webhdfs_url=http://localhost:50070/webhdfs/v1': '  webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
+            r'.* history_server_api_url=http://localhost:19888': '  history_server_api_url=%s' % yarn_log_url.split('/')[0],
+            r'.* resourcemanager_api_url=http://localhost:8088': '  resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
             })
 
     def open_ports(self):
@@ -166,12 +166,12 @@ class Hue(object):
         try:
             utils.run_as('hue', 'pkill', '-9', 'hue')
         except:
-            hookenv.log("Problem with Supervisor process, doing hard restart")
+            hookenv.log("Problem with Supervisor process, doing hard HUE restart")
             self.stop_hue()
             self.start_hue()
 
     def configure_hive(self, hostname, port):
-        hookenv.log("configuring hive connection...")
+        hookenv.log("Configuring hive connection")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.* hive_server_host=localhost': '  hive_server_host=%s' % hostname,
@@ -180,28 +180,28 @@ class Hue(object):
           
 
     def configure_oozie(self):
-        hookenv.log("configuring oozie connection...")
+        hookenv.log("configuring oozie connection")
 
     def configure_spark(self):
-        hookenv.log("configuring spark connection via livy...")
+        hookenv.log("configuring spark connection via livy")
 
     def configure_impala(self):
-        hookenv.log("probably wont be configuring impala any time soon....")
+        hookenv.log("configuring impala connection")
 
     def configure_sqoop(self):
-        hookenv.log("configuring sqoop connection...")
+        hookenv.log("configuring sqoop connection")
 
     def configure_hbase(self):
-        hookenv.log("configuring hbase connection...")
+        hookenv.log("configuring hbase connection")
 
     def configure_solr(self):
-        hookenv.log("configuring solr connection...")
+        hookenv.log("configuring solr connection")
 
     def configure_zookeeper(self):
-        hookenv.log("configuring zookeeper connection...")
+        hookenv.log("configuring zookeeper connection")
 
     def configure_aws(self):
-        hookenv.log("configuring AWS connection...")
+        hookenv.log("configuring AWS connection")
 
     def configure_sentry(self):
-        hookenv.log("configuring sentry connection...")
+        hookenv.log("configuring sentry connection")
