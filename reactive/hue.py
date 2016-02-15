@@ -131,7 +131,7 @@ def depart_oozie():
     remove_state('oozie.configured')
 
 
-@@when('hue.started')
+@when('hue.started')
 @when_not('spark.joined')
 def depart_spark():
     hue.relations(remove='Spark')
