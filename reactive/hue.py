@@ -18,8 +18,8 @@ from charms.hadoop import get_dist_config
 #    return get_dist_config.value
 
 
-#Define services that should relate to hue below
-HUE_RELS = ['hive', 'oozie', 'impala', 'spark']
+dist = get_dist_config()
+hue = Hue(dist)
 
 @when_not('hadoop.related')
 def missing_hadoop():
@@ -35,9 +35,6 @@ def report_waiting(hadoop):
 @when('hadoop.ready')
 @when_not('hue.installed')
 def install_hue(hadoop):
-    dist = get_dist_config()
-    hue = Hue(dist)
-    #hue = Hue(get_dist_config(DIST_KEYS))
     if hue.verify_resources():
         hookenv.status_set('maintenance', 'Installing Hue')
         dist.add_users()
@@ -75,54 +72,75 @@ def start_hue(hadoop):
     hookenv.status_set('active', 'Ready')
 
 
-@when('hue.started', 'hue.configured')
+#@when('hue.started', 'hue.configured')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
-    dist = get_dist_config()
-    hue = Hue(dist)
     hue.stop_hue()
     hue.start_hue()
 
 
 @when('hue.started')
-def need_relations():
-    wait_rels = ', '.join(HUE_RELS)
-    if len(wait_rels) > 0:
-        hookenv.status_set('waiting', 'Waiting for relations: ' + str(wait_rels))
-    else:
-        hookenv.status_set('active', 'Ready')
-        
+def check_relations():
+    hue.relations()
+
 
 @when('hue.started', 'hive.joined')
+@when_not('hive.configured')
 def configure_hive(hive):
-    dist = get_dist_config()
-    hue = Hue(dist)
     hive_host = hive.get_hostname()
     hive_port = hive.get_port()
-    HUE_RELS.append('hive')
+    hue.relations(add='Hive')
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
+    set_state('hive.configured')
+
+
+@when('hue.started', 'spark.joined')
+@when_not('spark.configured')
+def configure_spark(spark):
+    spark_host = spark.get_hostname()
+    spark_port = spark.get_port()
+    hue.relations(add='Spark')
+    if spark_port:
+        hue.configure_spark(spark_host, spark_port)
+    set_state('spark.configured')
+
+
+@when('hue.started', 'oozie.joined')
+@when_not('oozie.configured')
+def configure_oozie(oozie):
+    oozie_host = oozie.get_hostname()
+    oozie_port = oozie.get_port()
+    hue.relations(add='Oozie')
+    if oozie_port:
+        hue.configure_oozie(oozie_host, oozie_port)
+    set_state('oozie.configured')
+
 
 @when('hue.started')
 @when_not('hive.joined')
 def depart_hive():
-    if not 'hive' in HUE_RELS:
-        HUE_RELS.append('hive')
-    
-@when('hue.started', 'oozie.joined')
-def configure_oozie(oozie):
-    dist = get_dist_config()
-    hue = Hue(dist)
-    oozie_host = oozie.get_hostname()
-    oozie_port = oozie.get_port()
-    HUE_RELS.remove('oozie')
-    if oozie_port:
-        hue.configure_oozie(oozie_host, oozie_port)
+    hue.relations(remove='Hive')
+    remove_state('hive.configured')
 
 
-#@when('hue.started')
-#@when_not('hadoop.ready')
-#def stop_hue():
-#    hue.stop()
-#    remove_state('hue.started')
-#    hookenv.status_set('blocked', 'Waiting for Hadoop connection')
+@when('hue.started')
+@when_not('oozie.joined')
+def depart_oozie():
+    hue.relations(remove='Oozie')
+    remove_state('oozie.configured')
+
+
+@@when('hue.started')
+@when_not('spark.joined')
+def depart_spark():
+    hue.relations(remove='Spark')
+    remove_state('spark.configured')
+
+
+@when('hue.started')
+@when_not('hadoop.ready')
+def stop_hue():
+    hue.stop()
+    remove_state('hue.started')
+    hookenv.status_set('blocked', 'Waiting for Hadoop connection')

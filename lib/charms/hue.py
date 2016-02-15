@@ -2,7 +2,6 @@ import jujuresources
 from jujubigdata import utils
 from charmhelpers.core import unitdata, hookenv
 from charmhelpers import fetch
-
 from shutil import copy, copyfile
 import os
 
@@ -55,9 +54,32 @@ class Hue(object):
                               skip_top_level=True)
         self.dist_config.add_users()
         self.dist_config.add_dirs()
-
+        utils.run_as('root', 'chown', '-R', 'hue:hadoop', self.dist_config.path('hue'))
         unitdata.kv().set('hue.installed', True)
+        unitdata.kv().set('hue.rels', ['Hive','Oozie','Spark'])
         unitdata.kv().flush(True)
+
+    def relations(self, add=None, remove=None):
+        if add:
+            rels = unitdata.kv().get('hue.rels')
+            if add in rels:
+                return
+            else:
+                rels = rels.append(add)
+                unitdata.kv().set('hue.rels', rels)
+        if remove:
+            rels = unitdata.kv().get('hue.rels')
+            if remove not in rels:
+                return
+            else:
+                rels = rels.remove(remove)
+        unitdata.kv().flush(True)
+        rels = unitdata.kv().get('hue.rels')
+        wait_rels = ', '.join(rels)
+        if len(rels) > 0:
+            hookenv.status_set('waiting', 'Waiting for relations: ' + str(wait_rels))
+        else:
+            hookenv.status_set('active', 'Ready')
 
     def setup_hue(self, namenodes, resourcemanagers, hdfs_port, yarn_port, yarn_http, yarn_ipc):
         hookenv.status_set('maintenance', 'Setting up Hue')
