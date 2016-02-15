@@ -53,10 +53,10 @@ def configure_hue(hadoop):
     yarn_port = hadoop.yarn_port()
     yarn_http = hadoop.yarn_hs_http_port()
     yarn_ipcp = hadoop.yarn_hs_ipc_port()
-    hookenv.log("hs http, hs ipc: " + yarn_http + ", " + yarn_ipcp)
     hookenv.status_set('maintenance', 'Setting up Hue')
     hue = Hue(get_dist_config())
-    hue.setup_hue(namenodes, resmngmrs, hdfs_port, yarn_port, yarn_http, yarn_ipcp)
+    hue.setup_hue(namenodes, resmngmrs, hdfs_port,
+                  yarn_port, yarn_http, yarn_ipcp)
     set_state('hue.configured')
     hookenv.status_set('active', 'Ready')
 
@@ -67,21 +67,14 @@ def start_hue(hadoop):
     hookenv.status_set('maintenance', 'Setting up Hue')
     hue = Hue(get_dist_config())
     hue.open_ports()
-    hue.start_hue()
+    hue.start()
     set_state('hue.started')
     hookenv.status_set('active', 'Ready')
 
 
-#@when('hue.started', 'hue.configured')
 @when_file_changed('/etc/hue/conf/hue.ini')
 def restart_hue():
-    hue.stop_hue()
-    hue.start_hue()
-
-
-@when('hue.started')
-def check_relations():
-    hue.relations()
+    hue.restart()
 
 
 @when('hue.started', 'hive.joined')

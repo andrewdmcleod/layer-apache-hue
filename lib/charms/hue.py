@@ -56,23 +56,26 @@ class Hue(object):
         self.dist_config.add_dirs()
         utils.run_as('root', 'chown', '-R', 'hue:hadoop', self.dist_config.path('hue'))
         unitdata.kv().set('hue.installed', True)
-        unitdata.kv().set('hue.rels', ['Hive','Oozie','Spark'])
+        
+        # Following could be moved into layer options
+        unitdata.kv().set('hue.rels', ['Hive', 'Oozie', 'Spark'])
         unitdata.kv().flush(True)
 
-    def relations(self, add=None, remove=None):
-        if add:
-            rels = unitdata.kv().get('hue.rels')
-            if add in rels:
+    def relations(self, joined=None, departed=None):
+        unitdata.kv().flush(True)
+        rels = unitdata.kv().get('hue.rels')
+        if joined:
+            if joined not in rels:
                 return
             else:
-                rels = rels.append(add)
+                rels.remove(joined)
                 unitdata.kv().set('hue.rels', rels)
-        if remove:
-            rels = unitdata.kv().get('hue.rels')
-            if remove not in rels:
+        if departed:
+            if departed in rels:
                 return
             else:
-                rels = rels.remove(remove)
+                rels.append(departed)
+                unitdata.kv().set('hue.rels', rels)
         unitdata.kv().flush(True)
         rels = unitdata.kv().get('hue.rels')
         wait_rels = ', '.join(rels)
@@ -144,18 +147,28 @@ class Hue(object):
         for port in self.dist_config.exposed_ports('hue'):
             hookenv.close_port(port)
 
-    def start_hue(self):
+    def start(self):
         self.stop_hue()
-        hookenv.log("starting hue somehow...")
+        hookenv.log("Starting HUE with Supervisor process"
         hue_log = self.dist_config.path('hue_log')
         utils.run_as('hue', '/usr/lib/hue/build/env/bin/supervisor', '-l', hue_log, '-d')
 
-    def stop_hue(self):
-        hookenv.log("stopping hue somehow...")
+    def stop(self):
+        hookenv.log("Stopping HUE and Supervisor process")
         try:
             utils.run_as('hue', 'pkill', '-9', 'supervisor')
+            utils.run_as('hue', 'pkill', '-9', 'hue')
         except:
             return
+
+    def restart(self):
+        hookenv.log("Restarting HUE with Supervisor process"
+        try:
+            utils.run_as('hue', 'pkill', '-9', 'hue')
+        except:
+            hookenv.log("Problem with Supervisor process, doing hard restart")
+            self.stop_hue()
+            self.start_hue()
 
     def configure_hive(self, hostname, port):
         hookenv.log("configuring hive connection...")
