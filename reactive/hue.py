@@ -114,21 +114,21 @@ def configure_oozie(oozie):
     set_state('oozie.configured')
 
 
-@when('hue.started')
+@when('hue.started', 'hive.configured')
 @when_not('hive.joined')
 def depart_hive():
     hue.check_relations()
     remove_state('hive.configured')
 
 
-@when('hue.started')
+@when('hue.started', 'oozie.configured')
 @when_not('oozie.joined')
 def depart_oozie():
     hue.check_relations()
     remove_state('oozie.configured')
 
 
-@when('hue.started')
+@when('hue.started', 'spark.configured')
 @when_not('spark.joined')
 def depart_spark():
     hue.check_relations()
