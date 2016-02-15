@@ -162,7 +162,7 @@ class Hue(object):
             return
 
     def restart(self):
-        hookenv.log("Restarting HUE with Supervisor process"
+        hookenv.log("Restarting HUE with Supervisor process")
         try:
             utils.run_as('hue', 'pkill', '-9', 'hue')
         except:
