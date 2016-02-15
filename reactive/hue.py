@@ -73,11 +73,12 @@ def start_hue(hadoop):
     hue.check_relations()
 
 
-@when_file_changed('/etc/hue/conf/hue.ini')
-def restart_hue():
-    # Can't seem to mix @when_file_changed and @when('hue.started')
-    if 'hue.started' in get_states():
-        hue.restart()
+# Since I can't garauntee when the file is first hashed, I cant use this function
+#@when_file_changed('/etc/hue/conf/hue.ini')
+#def restart_hue():
+#    # Can't seem to mix @when_file_changed and @when('hue.started')
+#    if 'hue.started' in get_states():
+#        hue.restart()
 
 
 @when('hue.started', 'hive.joined')
@@ -87,6 +88,7 @@ def configure_hive(hive):
     hive_port = hive.get_port()
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
+    hue.restart()
     set_state('hive.configured')
     hue.check_relations()
 
@@ -98,6 +100,7 @@ def configure_spark(spark):
     spark_port = spark.get_port()
     if spark_port:
         hue.configure_spark(spark_host, spark_port)
+    hue.restart()
     set_state('spark.configured')
     hue.check_relations()
 
@@ -109,6 +112,7 @@ def configure_oozie(oozie):
     oozie_port = oozie.get_port()
     if oozie_port:
         hue.configure_oozie(oozie_host, oozie_port)
+    hue.restart()
     set_state('oozie.configured')
     hue.check_relations()
 
