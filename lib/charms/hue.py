@@ -148,7 +148,7 @@ class Hue(object):
             hookenv.close_port(port)
 
     def start(self):
-        self.stop_hue()
+        self.stop()
         hookenv.log("Starting HUE with Supervisor process")
         hue_log = self.dist_config.path('hue_log')
         utils.run_as('hue', '/usr/lib/hue/build/env/bin/supervisor', '-l', hue_log, '-d')
@@ -167,8 +167,8 @@ class Hue(object):
             utils.run_as('hue', 'pkill', '-9', 'hue')
         except:
             hookenv.log("Problem with Supervisor process, doing hard HUE restart")
-            self.stop_hue()
-            self.start_hue()
+            self.stop()
+            self.start()
 
     def configure_hive(self, hostname, port):
         hookenv.log("Configuring hive connection")
