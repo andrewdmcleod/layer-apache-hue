@@ -59,6 +59,7 @@ def configure_hue(hadoop):
     hue.setup_hue(namenodes, resmngmrs, hdfs_port,
                   yarn_port, yarn_http, yarn_ipcp)
     set_state('hue.configured')
+    hue.check_relations()
 
 
 @when('hue.installed', 'hadoop.ready', 'hue.configured')
@@ -77,8 +78,7 @@ def restart_hue():
     # Can't seem to mix @when_file_changed and @when('hue.started')
     if 'hue.started' in get_states():
         hue.restart()
-    else:
-        return
+
 
 @when('hue.started', 'hive.joined')
 @when_not('hive.configured')

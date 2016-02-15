@@ -78,7 +78,7 @@ class Hue(object):
 
         wait_rels = ', '.join(current_relations)
         if len(current_relations) > 0:
-            hookenv.status_set('waiting', 'Waiting for relations: ' + str(wait_rels))
+            hookenv.status_set('waiting', 'Waiting for relations: ' + wait_rels)
         else:
             hookenv.status_set('active', 'Ready')
 
