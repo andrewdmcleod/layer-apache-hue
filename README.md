@@ -1,4 +1,4 @@
-# This charm is under construction and further work in these areas:
+# This charm is under construction and requires further work in these areas:
 
   oozie interface and configuration
   spark-livy interface and configuration
