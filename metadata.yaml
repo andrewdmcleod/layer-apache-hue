@@ -1,5 +1,5 @@
-name: apache-hue
-summary: Apache Hue
+name: hue
+summary: Hue
 maintainer: Andrew McLeod <andrew.mcleod@canonical.com>
 description: |
   Hue hue hue...

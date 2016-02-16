@@ -7,4 +7,4 @@ options:
     hue-version:
         type: string
         default: 3.9.0
-        description: Apache HUE version - for IBM POWER set to ??
+        description: HUE version - for IBM POWER set to ??
