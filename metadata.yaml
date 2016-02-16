@@ -11,6 +11,8 @@ requires:
     interface: hive
   oozie:
     interface: oozie
+  livy:
+    interface: livy
 provides:
   hadoop:
     interface: hadoop-plugin
