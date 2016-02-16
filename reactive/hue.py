@@ -1,26 +1,14 @@
-#import jujuresources
 from charms.reactive import when, when_not, when_file_changed
 from charms.reactive import set_state, remove_state
 from charms.reactive.bus import get_states
 from charmhelpers.core import hookenv
-#from jujubigdata import utils
-#from charmhelpers.fetch import apt_install
-#from subprocess import check_call
 from charms.hue import Hue
 from charms.hadoop import get_dist_config
-
-#DIST_KEYS = ['hadoop_version', 'groups', 'users', 'dirs', 'ports']
-
-#def get_dist_config(keys):
-#    from jujubigdata.utils import DistConfig
-#
-#    if not getattr(get_dist_config, 'value', None):
-#        get_dist_config.value = DistConfig(filename='dist.yaml', required_keys=keys)
-#    return get_dist_config.value
 
 
 dist = get_dist_config()
 hue = Hue(dist)
+
 
 @when_not('hadoop.related')
 def missing_hadoop():
@@ -73,12 +61,11 @@ def start_hue(hadoop):
     hue.check_relations()
 
 
-# Since I can't garauntee when the file is first hashed, I cant use this function
-#@when_file_changed('/etc/hue/conf/hue.ini')
-#def restart_hue():
-#    # Can't seem to mix @when_file_changed and @when('hue.started')
-#    if 'hue.started' in get_states():
-#        hue.restart()
+if 'hue.started' in get_states():
+    @when_file_changed('/etc/hue/conf/hue.ini')
+    def restart_hue():
+        # Can't seem to mix @when_file_changed and @when('hue.started')
+        hue.restart()
 
 
 @when('hue.started', 'hive.joined')
@@ -88,7 +75,6 @@ def configure_hive(hive):
     hive_port = hive.get_port()
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
-    hue.restart()
     set_state('hive.configured')
     hue.check_relations()
 
@@ -100,7 +86,6 @@ def configure_spark(spark):
     spark_port = spark.get_port()
     if spark_port:
         hue.configure_spark(spark_host, spark_port)
-    hue.restart()
     set_state('spark.configured')
     hue.check_relations()
 
@@ -112,7 +97,6 @@ def configure_oozie(oozie):
     oozie_port = oozie.get_port()
     if oozie_port:
         hue.configure_oozie(oozie_host, oozie_port)
-    hue.restart()
     set_state('oozie.configured')
     hue.check_relations()
 
