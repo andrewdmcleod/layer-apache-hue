@@ -67,7 +67,7 @@ class Hue(object):
 
         The 'required relations' could/should be moved into layer options.
         '''
-        required_relations = ['hive', 'oozie', 'spark']
+        required_relations = ['hive', 'oozie', 'livy']
         current_relations = required_relations
         all_states = get_states()
         for k, v in all_states.items():
@@ -176,12 +176,16 @@ class Hue(object):
             r'.*hive_server_port *=.*': 'hive_server_port=%s' % port
             })
           
-
     def configure_oozie(self):
         hookenv.log("configuring oozie connection")
 
-    def configure_spark(self):
+    def configure_livy(self, hostname, port):
         hookenv.log("configuring spark connection via livy")
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
+        utils.re_edit_in_place(hue_config, {
+            r'.*livy_server_host *=.*': 'hive_server_host=%s' % hostname,
+            r'.*livy_server_port *=.*': 'hive_server_port=%s' % port
+            })  
 
     def configure_impala(self):
         hookenv.log("configuring impala connection")
