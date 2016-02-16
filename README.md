@@ -1,7 +1,7 @@
 # This charm is under construction and requires further work in these areas:
 
-  oozie interface and configuration
-  spark-livy interface and configuration
+        oozie interface and configuration
+        spark-livy interface and configuration
 
 ## Overview
 
