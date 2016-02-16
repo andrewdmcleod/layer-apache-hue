@@ -3,6 +3,7 @@
         oozie interface and configuration
         spark-livy interface and configuration
         clean up unused packages in lib/charms/hue.py
+        desktop.secret_key configured as random string
 
 ## Overview
 
