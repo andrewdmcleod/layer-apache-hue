@@ -71,7 +71,7 @@ def check_relations(*args):
     hue.check_relations()
 
 
-@when('hue.started', 'hive.ready')
+@when('hue.started', 'hive.joined')
 @when_not('hive.configured')
 def configure_hive(hive):
     hive_host = hive.get_hostname()
@@ -79,9 +79,10 @@ def configure_hive(hive):
     if hive_port:
         hue.configure_hive(hive_host, hive_port)
     set_state('hive.configured')
+    hue.check_relations()
 
 
-@when('hue.started', 'spark.available')
+@when('hue.started', 'spark.joined')
 @when_not('spark.configured')
 def configure_spark(spark):
     spark_host = spark.get_hostname()
@@ -89,9 +90,10 @@ def configure_spark(spark):
     if spark_rest_port:
         hue.configure_spark(spark_host, spark_rest_port)
     set_state('spark.configured')
+    hue.check_relations()
 
 
-@when('hue.started', 'oozie.ready')
+@when('hue.started', 'oozie.joined')
 @when_not('oozie.configured')
 def configure_oozie(oozie):
     oozie_host = oozie.get_hostname()
@@ -99,6 +101,7 @@ def configure_oozie(oozie):
     if oozie_port:
         hue.configure_oozie(oozie_host, oozie_port)
     set_state('oozie.configured')
+    hue.check_relations()
 
 
 @when('hue.started', 'hive.configured')
