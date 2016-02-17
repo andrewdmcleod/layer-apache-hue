@@ -79,14 +79,14 @@ def configure_hive(hive):
     hue.check_relations()
 
 
-@when('hue.started', 'livy.joined')
-@when_not('livy.configured')
-def configure_livy(livy):
-    livy_host = livy.get_hostname()
-    livy_port = livy.get_port()
-    if livy_port:
-        hue.configure_livy(livy_host, livy_port)
-    set_state('livy.configured')
+@when('hue.started', 'spark.joined')
+@when_not('spark.configured')
+def configure_spark(spark):
+    spark_host = spark.get_hostname()
+    spark_port = spark.get_port()
+    if spark_port:
+        hue.configure_spark(spark_host, spark_port)
+    set_state('spark.configured')
     hue.check_relations()
 
 
@@ -115,10 +115,10 @@ def depart_oozie():
     hue.check_relations()
 
 
-@when('hue.started', 'livy.configured')
-@when_not('livy.joined')
-def depart_livy():
-    remove_state('livy.configured')
+@when('hue.started', 'spark.configured')
+@when_not('spark.joined')
+def depart_spark():
+    remove_state('spark.configured')
     hue.check_relations()
 
 
