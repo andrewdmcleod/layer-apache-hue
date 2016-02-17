@@ -67,7 +67,7 @@ class Hue(object):
 
         The 'required relations' could/should be moved into layer options.
         '''
-        required_relations = ['hive', 'oozie', 'livy']
+        required_relations = ['hive', 'oozie', 'spark']
         current_relations = required_relations
         all_states = get_states()
         for k, v in all_states.items():
