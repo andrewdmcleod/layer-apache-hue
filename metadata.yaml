@@ -11,7 +11,7 @@ requires:
     interface: hive
   oozie:
     interface: oozie
-  livy:
+  spark:
     interface: livy
 provides:
   hadoop:
