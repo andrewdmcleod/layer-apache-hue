@@ -5,6 +5,7 @@ from charmhelpers.core.host import chownr
 from charms.reactive.bus import get_states
 from charmhelpers import fetch
 import os
+import yaml
 
 # Main Hue class for callbacks
 class Hue(object):
@@ -66,9 +67,9 @@ class Hue(object):
         function
         '''
         additional_relations = []
-        metadata_stream = open('metadata.yaml','r')
+        metadata_stream = open('metadata.yaml', 'r')
         data = yaml.load(metadata_stream)
-        for key in data['requires']
+        for key in data['requires']:
             additional_relations.append(key)
         current_relations = additional_relations
         all_states = get_states()
