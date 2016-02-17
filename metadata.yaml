@@ -12,7 +12,7 @@ requires:
   oozie:
     interface: oozie
   spark:
-    interface: livy
+    interface: spark 
 provides:
   hadoop:
     interface: hadoop-plugin
