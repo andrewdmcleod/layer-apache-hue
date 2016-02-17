@@ -61,19 +61,21 @@ class Hue(object):
         
     def check_relations(self):
         '''
-        This function checks the 'required_relations' list against the joined 
+        This function checks the 'additional_relations' list against the joined 
         relation states so we don't have to explicitly set_status in each reactive
         function
-
-        The 'required relations' could/should be moved into layer options.
         '''
-        required_relations = ['hive', 'oozie', 'spark']
-        current_relations = required_relations
+        additional_relations = []
+        metadata_stream = open('metadata.yaml','r')
+        data = yaml.load(metadata_stream)
+        for key in data['requires']
+            additional_relations.append(key)
+        current_relations = additional_relations
         all_states = get_states()
         for k, v in all_states.items():
             if "joined" in k:
                 relname = k.split('.')[0]
-                if relname in required_relations:
+                if relname in additional_relations:
                     current_relations.remove(relname)
 
         wait_rels = ', '.join(current_relations)
