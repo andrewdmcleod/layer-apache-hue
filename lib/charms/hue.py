@@ -179,7 +179,7 @@ class Hue(object):
     def configure_oozie(self):
         hookenv.log("configuring oozie connection")
 
-    def configure_livy(self, hostname, port):
+    def configure_spark(self, hostname, port):
         hookenv.log("configuring spark connection via livy")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
