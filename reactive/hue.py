@@ -58,7 +58,6 @@ def start_hue(hadoop):
     hue.start()
     set_state('hue.started')
 
-
 if 'hue.started' in get_states():
     @when_file_changed('/etc/hue/conf/hue.ini')
     def restart_hue():
@@ -73,44 +72,44 @@ def check_relations(*args):
 
 @when('hue.started', 'hive.ready')
 def configure_hive(hive):
-    hive_host = hive.get_hostname()
+    hive_host = hive.get_private_ip()
     hive_port = hive.get_port()
     hue.configure_hive(hive_host, hive_port)
-    hue.check_relations()
+    set_state('hive.configured')
 
 
 @when('hue.started', 'spark.ready')
 def configure_spark(spark):
-    spark_host = spark.get_hostname()
+    spark_host = spark.get_private_ip()
     spark_rest_port = spark.get_rest_port()
     hue.configure_spark(spark_host, spark_rest_port)
-    hue.check_relations()
+    set_state('spark.configured')
 
 
 @when('hue.started', 'oozie.ready')
 def configure_oozie(oozie):
-    oozie_host = oozie.get_hostname()
+    oozie_host = oozie.get_private_ip()
     oozie_port = oozie.get_port()
     hue.configure_oozie(oozie_host, oozie_port)
-    hue.check_relations()
+    set_state('oozie.configured')
 
 
 @when('hue.started', 'hive.configured')
 @when_not('hive.joined')
 def depart_hive():
-    hue.check_relations()
+    remove_state('hive.configured')
 
 
 @when('hue.started', 'oozie.configured')
 @when_not('oozie.joined')
 def depart_oozie():
-    hue.check_relations()
+    remove_state('oozie.configured')
 
 
 @when('hue.started', 'spark.configured')
 @when_not('spark.joined')
 def depart_spark():
-    hue.check_relations()
+    remove_state('spark.configured')
 
 
 @when('hue.started')
