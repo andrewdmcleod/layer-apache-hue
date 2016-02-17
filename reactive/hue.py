@@ -83,9 +83,9 @@ def configure_hive(hive):
 @when_not('spark.configured')
 def configure_spark(spark):
     spark_host = spark.get_hostname()
-    spark_port = spark.get_port()
+    spark_rest_port = spark.get_rest_port()
     if spark_port:
-        hue.configure_spark(spark_host, spark_port)
+        hue.configure_spark(spark_host, spark_rest_port)
     set_state('spark.configured')
     hue.check_relations()
 
