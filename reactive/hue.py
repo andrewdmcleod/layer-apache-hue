@@ -47,7 +47,6 @@ def configure_hue(hadoop):
     hue.setup_hue(namenodes, resmngmrs, hdfs_port,
                   yarn_port, yarn_http, yarn_ipcp)
     set_state('hue.configured')
-    hue.check_relations()
 
 
 @when('hue.installed', 'hadoop.ready', 'hue.configured')
@@ -58,7 +57,6 @@ def start_hue(hadoop):
     hue.open_ports()
     hue.start()
     set_state('hue.started')
-    hue.check_relations()
 
 
 if 'hue.started' in get_states():
@@ -69,7 +67,7 @@ if 'hue.started' in get_states():
 
 
 @when('hue.started', 'hadoop.ready')
-def check_relations():
+def check_relations(*args):
     hue.check_relations()
 
 
