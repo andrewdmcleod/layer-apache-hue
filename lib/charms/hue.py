@@ -172,7 +172,7 @@ class Hue(object):
             self.start()
 
     def configure_hive(self, hostname, port):
-        # Configuring HIVE
+        #hookenv.log("configuring hive connection")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.*hive_server_host *=.*': 'hive_server_host=%s' % hostname,
@@ -180,10 +180,10 @@ class Hue(object):
             })
           
     def configure_oozie(self):
-        hookenv.log("configuring oozie connection")
+        #hookenv.log("configuring oozie connection")
 
     def configure_spark(self, hostname, port):
-        hookenv.log("configuring spark connection via livy")
+        #hookenv.log("configuring spark connection via livy")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.*livy_server_host *=.*': 'livy_server_host=%s' % hostname,
