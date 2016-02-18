@@ -172,7 +172,7 @@ class Hue(object):
             self.start()
 
     def configure_hive(self, hostname, port):
-        hookenv.log("Configuring hive connection")
+        # Configuring HIVE
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.*hive_server_host *=.*': 'hive_server_host=%s' % hostname,
@@ -186,8 +186,8 @@ class Hue(object):
         hookenv.log("configuring spark connection via livy")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
-            r'.*livy_server_host *=.*': 'hive_server_host=%s' % hostname,
-            r'.*livy_server_port *=.*': 'hive_server_port=%s' % port
+            r'.*livy_server_host *=.*': 'livy_server_host=%s' % hostname,
+            r'.*livy_server_port *=.*': 'livy_server_port=%s' % port
             })  
 
     def configure_impala(self):
