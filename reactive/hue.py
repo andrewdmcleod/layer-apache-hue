@@ -71,44 +71,64 @@ def check_relations(*args):
 
 
 @when('hue.started', 'hive.ready')
+@when_not('hive.configured')
 def configure_hive(hive):
+    hookenv.status_set('maintenance', 'Configuring Hue for Hive')
     hive_host = hive.get_private_ip()
     hive_port = hive.get_port()
     hue.configure_hive(hive_host, hive_port)
+    hue.update_apps()
+    hue.restart()
     set_state('hive.configured')
 
 
 @when('hue.started', 'spark.ready')
+@when_not('spark.configured')
 def configure_spark(spark):
+    hookenv.status_set('maintenance', 'Configuring Hue for Spark')
     spark_host = spark.get_private_ip()
     spark_rest_port = spark.get_rest_port()
     hue.configure_spark(spark_host, spark_rest_port)
+    hue.update_apps()
+    hue.restart()
     set_state('spark.configured')
 
 
 @when('hue.started', 'oozie.ready')
+@when_not('oozie.configured')
 def configure_oozie(oozie):
     oozie_host = oozie.get_private_ip()
     oozie_port = oozie.get_port()
     hue.configure_oozie(oozie_host, oozie_port)
+    hue.update_apps()
+    hue.restart()
     set_state('oozie.configured')
 
 
 @when('hue.started', 'hive.configured')
 @when_not('hive.joined')
 def depart_hive():
+    hookenv.status_set('maintenance', 'Disconnecting Hive from Hue')
+    hue.update_apps()
+    hue.restart()
     remove_state('hive.configured')
 
 
 @when('hue.started', 'oozie.configured')
 @when_not('oozie.joined')
 def depart_oozie():
+    hookenv.status_set('maintenance', 'Disconnecting Oozie from Hue')
+    hue.update_apps()
+    hue.restart()
     remove_state('oozie.configured')
 
 
 @when('hue.started', 'spark.configured')
 @when_not('spark.joined')
 def depart_spark():
+    hookenv.status_set('maintenance', 'Disconnecting Spark from Hue')
+    hue.update_apps()
+    hue.restart()
     remove_state('spark.configured')
 
 
