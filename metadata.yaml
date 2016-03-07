@@ -1,5 +1,5 @@
 name: hue
-summary: Hue, the open source Web interface for analyzing data with Hadoop and Spark.
+summary: Hue, the interface for analyzing data with Hadoop and Spark.
 maintainer: "Juju Big Data Team <bigdata@lists.ubuntu.com>"
 description: |
   Hue works towards integrating most Apache Hadoop components into a single interface.
