@@ -37,7 +37,8 @@ the default admin user so we need to make sure you are the first person to
 log in.
 
 The allowed Hadoop cluster operations should be available from the web interface.
-Additional features will be made available as you relate hue to other charms,
+By default HDFS file browsing and Hadoop job browsing should be available.
+Additional features will be made available as you relate Hue to other charms,
 as described below.
 
 

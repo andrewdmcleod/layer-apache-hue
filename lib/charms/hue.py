@@ -153,10 +153,10 @@ class Hue(object):
     def update_apps(self):
         # Add all services disabled unless we have a joined relation
         # as marked by the respective state
-        # Enabled by default: 'filebrowser', 
+        # Enabled by default: 'filebrowser', 'jobbrowser'
         disabled_services = ['beeswax','impala','security',
-            'jobbrowser','rdbms','jobsub','pig','hbase','sqoop',
-            'zookeeper','metastore','spark','oozie','indexer']
+            'rdbms','jobsub','pig','hbase','sqoop',
+            'zookeeper','metastore','spark','oozie','indexer','search']
 
         for k, v in get_states().items():
             if "joined" in k:
