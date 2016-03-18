@@ -21,42 +21,16 @@ class Hue(object):
     def is_installed(self):
         return unitdata.kv().get('hue.installed')
 
-    def pre_install(self):
-        hue_version = jujuresources.config_get("hue-version")
-        packages = [
-            "ant",
-            "g++",
-            "libsasl2-modules-gssapi-mit",
-            "libtidy-0.99-0",
-            "python2.7-dev",
-            "maven",
-            "python-dev",
-            "python-simplejson",
-            "python-setuptools",
-            "make",
-            "libsasl2-dev",
-            "libmysqlclient-dev",
-            "libkrb5-dev",
-            "libxml2-dev",
-            "libxslt-dev",
-            "libxslt1-dev",
-            "libsqlite3-dev",
-            "libssl-dev",
-            "libldap2-dev",
-            "python-pip"
-        ]
-        fetch.apt_install(packages)
-
     def install(self, force=False):
         if not force and self.is_installed():
             return
-        self.pre_install()
         jujuresources.install(self.resources['hue'],
                               destination=self.dist_config.path('hue'),
                               skip_top_level=True)
+
         self.dist_config.add_users()
         self.dist_config.add_dirs()
-        #utils.run_as('root', 'chown', '-R', 'hue:hadoop', self.dist_config.path('hue'))
+        self.dist_config.add_packages()
         chownr(self.dist_config.path('hue'), 'hue', 'hadoop')
         unitdata.kv().set('hue.installed', True)
         
@@ -168,10 +142,12 @@ class Hue(object):
                     disabled_services.remove('spark')
                 if 'oozie' in relname:
                     disabled_services.remove('oozie')
+                if 'zookeeper' in relname:
+                    disabled_services.remove('zookeeper')
 
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         services_string = ','.join(disabled_services)
-        print("*** Disabled apps {} ***".format(services_string))
+        hookenv.log("Disabled apps {}".format(services_string))
         utils.re_edit_in_place(hue_config, {
             r'.*app_blacklist=.*': ''.join(('app_blacklist=', services_string))
             })
@@ -207,13 +183,30 @@ class Hue(object):
         self.start()
 
     def configure_hive(self, hostname, port):
-        #hookenv.log("configuring hive connection")
+        hookenv.log("configuring hive connection")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.*hive_server_host *=.*': 'hive_server_host=%s' % hostname,
             r'.*hive_server_port *=.*': 'hive_server_port=%s' % port
             })
-          
+
+    def configure_zookeeper(self, zookeepers):
+        hookenv.log("configuring zookeeper connection")
+        zks_endpoints = []
+        for zk in zookeepers:
+            zks_endpoints.append('{}:{}'.format(zk['host'], zk['port']))
+
+        ensemble = ','.join(zks_endpoints)
+
+        zk_rest_url = "http://{}:{}".format(zookeepers[0]['host'], 
+                                            zookeepers[0]['rest_port'])
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
+        utils.re_edit_in_place(hue_config, {
+            r'.*host_ports=.*': 'host_ports=%s' % ensemble,
+            r'.*rest_url=.*': 'rest_url=%s' % zk_rest_url,
+            r'.*ensemble=.*': 'ensemble=%s' % ensemble
+            })
+
     def configure_oozie(self):
         hookenv.log("configuring oozie connection")
 
@@ -236,9 +229,6 @@ class Hue(object):
 
     def configure_solr(self):
         hookenv.log("configuring solr connection")
-
-    def configure_zookeeper(self):
-        hookenv.log("configuring zookeeper connection")
 
     def configure_aws(self):
         hookenv.log("configuring AWS connection")

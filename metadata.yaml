@@ -9,6 +9,8 @@ tags: [bigdata, hadoop]
 requires:
   hive:
     interface: hive
+  zookeeper:
+    interface: zookeeper
 #  oozie:
 #    interface: oozie
 #  spark:
