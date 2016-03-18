@@ -61,6 +61,19 @@ Hue should restart and in its updated interface you should be able to query Hive
 the metasotre.
 
 
+## Enabling Apache Zookeeper features
+
+Hue interacts with Zookeeper through the laters REST Api.
+The steps for relating Hue to Zookeeper are as follows:
+
+    juju deploy apache-zookeeper zookeeper
+    juju set zookeeper rest=true
+
+Now just add a relation between Zookeeper and Hue
+
+    juju add-relation hue zookeeper
+
+Hue should restart and in its updated interface you should be able to browse Zookeeper.
 
 
 ## Contact Information

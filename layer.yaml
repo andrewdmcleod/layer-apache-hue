@@ -1,4 +1,4 @@
-includes: ['layer:basic', 'layer:hadoop-client', 'interface:hadoop-plugin', 'interface:zookeeper', 'interface:hive', 'interface:spark']
+includes: ['layer:basic', 'layer:hadoop-client', 'interface:hive', 'interface:zookeeper']
 options:
   basic:
     packages:
