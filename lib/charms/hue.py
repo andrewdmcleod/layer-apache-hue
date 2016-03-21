@@ -7,7 +7,7 @@ from charmhelpers import fetch
 import os
 import yaml
 
-# Main Hue class for callbacks
+
 class Hue(object):
 
     def __init__(self, dist_config):
