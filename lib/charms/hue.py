@@ -1,12 +1,12 @@
+import os
+import yaml
+import uuid
 import jujuresources
 from jujubigdata import utils
 from charmhelpers.core import unitdata, hookenv
 from charmhelpers.core.host import chownr
 from charms.reactive.bus import get_states
 from charmhelpers import fetch
-import os
-import yaml
-
 
 class Hue(object):
 
@@ -111,7 +111,8 @@ class Hue(object):
             r'.*resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_port,
             r'.*webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
             r'.*history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
-            r'.*resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
+            r'.*resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0],
+            r'.*secret_key=.*': 'secret_key=%s' % uuid.uuid4()
             })
 
         self.update_apps()
