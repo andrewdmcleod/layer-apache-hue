@@ -1,3 +1,4 @@
+repo: git@github.com:juju-solutions/layer-hue.git
 includes: ['layer:basic', 'layer:hadoop-client', 'interface:hive', 'interface:zookeeper']
 options:
   basic:
