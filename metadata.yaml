@@ -1,9 +1,9 @@
 name: hue
 summary: Hue, the interface for analyzing data with Hadoop and Spark.
-maintainer: "Juju Big Data Team <bigdata@lists.ubuntu.com>"
+maintainer: Juju Big Data <bigdata@lists.ubuntu.com>
 description: |
   Hue works towards integrating most Apache Hadoop components into a single interface.
-  Its goal is to improve user experience and allow users to interact with Hadoop 
+  Its goal is to improve user experience and allow users to interact with Hadoop
   through a web interface.
 tags: [bigdata, hadoop]
 requires:

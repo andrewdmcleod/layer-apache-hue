@@ -44,8 +44,8 @@ as described below.
 
 ## Enabling Apache Hive features
 
-Adding Apache Hive features to hive is as simple as deploying the Hive charm and
-relating it to hive:
+Adding Apache Hive features to Hue is as simple as deploying the Hive charm and
+relating it to Hue. First, deploy Hive/MySQL:
 
 
     juju deploy mysql
@@ -53,32 +53,33 @@ relating it to hive:
     juju deploy apache-hive hive
     juju add-relation plugin hive
 
-Now just add a relation between Hive and Hue
+Now, add a relation between Hive and Hue:
 
     juju add-relation hue hive
 
-Hue should restart and in its updated interface you should be able to query Hive and browse
-the metasotre.
+Hue should restart, and you should be able to query Hive and browse the
+metasotre from the updated Hue UI.
 
 
 ## Enabling Apache Zookeeper features
 
-Hue interacts with Zookeeper through the laters REST Api.
-The steps for relating Hue to Zookeeper are as follows:
+Hue interacts with Zookeeper through a REST API.
+Relate Hue to Zookeeper as follows:
 
     juju deploy apache-zookeeper zookeeper
     juju set zookeeper rest=true
 
-Now just add a relation between Zookeeper and Hue
+Now, add a relation between Zookeeper and Hue:
 
     juju add-relation hue zookeeper
 
-Hue should restart and in its updated interface you should be able to browse Zookeeper.
+Hue should restart, and you should be able to browse Zookeeper from the
+updated Hue UI.
 
 
 ## Contact Information
 
-- <bigdata-dev@lists.launchpad.net>
+- <bigdata@lists.ubunt.com>
 
 
 ## Help
