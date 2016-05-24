@@ -1,5 +1,27 @@
-includes: ['layer:hadoop-client', 'interface:hive', 'interface:spark']
+includes: ['layer:basic', 'layer:hadoop-client', 'interface:hive', 'interface:zookeeper']
 options:
+  basic:
+    packages:
+      - ant
+      - g++
+      - libsasl2-modules-gssapi-mit
+      - libtidy-0.99-0
+      - python2.7-dev
+      - maven
+      - python-dev
+      - python-simplejson
+      - python-setuptools
+      - make
+      - libsasl2-dev
+      - libmysqlclient-dev
+      - libkrb5-dev
+      - libxml2-dev
+      - libxslt-dev
+      - libxslt1-dev
+      - libsqlite3-dev
+      - libssl-dev
+      - libldap2-dev
+      - python-pip
   hadoop-client:
     hadoop_version: '2.7.1'
     groups:

@@ -1,13 +1,13 @@
+import os
+import yaml
+import uuid
 import jujuresources
 from jujubigdata import utils
 from charmhelpers.core import unitdata, hookenv
 from charmhelpers.core.host import chownr
 from charms.reactive.bus import get_states
 from charmhelpers import fetch
-import os
-import yaml
 
-# Main Hue class for callbacks
 class Hue(object):
 
     def __init__(self, dist_config):
@@ -21,42 +21,16 @@ class Hue(object):
     def is_installed(self):
         return unitdata.kv().get('hue.installed')
 
-    def pre_install(self):
-        hue_version = jujuresources.config_get("hue-version")
-        packages = [
-            "ant",
-            "g++",
-            "libsasl2-modules-gssapi-mit",
-            "libtidy-0.99-0",
-            "python2.7-dev",
-            "maven",
-            "python-dev",
-            "python-simplejson",
-            "python-setuptools",
-            "make",
-            "libsasl2-dev",
-            "libmysqlclient-dev",
-            "libkrb5-dev",
-            "libxml2-dev",
-            "libxslt-dev",
-            "libxslt1-dev",
-            "libsqlite3-dev",
-            "libssl-dev",
-            "libldap2-dev",
-            "python-pip"
-        ]
-        fetch.apt_install(packages)
-
     def install(self, force=False):
         if not force and self.is_installed():
             return
-        self.pre_install()
         jujuresources.install(self.resources['hue'],
                               destination=self.dist_config.path('hue'),
                               skip_top_level=True)
+
         self.dist_config.add_users()
         self.dist_config.add_dirs()
-        #utils.run_as('root', 'chown', '-R', 'hue:hadoop', self.dist_config.path('hue'))
+        self.dist_config.add_packages()
         chownr(self.dist_config.path('hue'), 'hue', 'hadoop')
         unitdata.kv().set('hue.installed', True)
         
@@ -81,7 +55,7 @@ class Hue(object):
 
         wait_rels = ', '.join(current_relations)
         if len(current_relations) > 0:
-            hookenv.status_set('waiting', 'Waiting for relations: ' + wait_rels)
+            hookenv.status_set('active', 'Ready. Accepting connections to {}'.format(wait_rels))
         else:
             hookenv.status_set('active', 'Ready')
 
@@ -137,8 +111,11 @@ class Hue(object):
             r'.*resourcemanager_port=8032': 'resourcemanager_port=%s' % yarn_port,
             r'.*webhdfs_url=http://localhost:50070/webhdfs/v1': 'webhdfs_url=http://%s:50070/webhdfs/v1' % namenodes[0],
             r'.*history_server_api_url=http://localhost:19888': 'history_server_api_url=%s' % yarn_log_url.split('/')[0],
-            r'.*resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0]
+            r'.*resourcemanager_api_url=http://localhost:8088': 'resourcemanager_api_url=http://%s:8088' % yarn_resmgr.split(':')[0],
+            r'.*secret_key=.*': 'secret_key=%s' % uuid.uuid4()
             })
+
+        self.update_apps()
 
     def open_ports(self):
         for port in self.dist_config.exposed_ports('hue'):
@@ -147,6 +124,36 @@ class Hue(object):
     def close_ports(self):
         for port in self.dist_config.exposed_ports('hue'):
             hookenv.close_port(port)
+
+    def update_apps(self):
+        # Add all services disabled unless we have a joined relation
+        # as marked by the respective state
+        # Enabled by default: 'filebrowser', 'jobbrowser'
+        disabled_services = ['beeswax','impala','security',
+            'rdbms','jobsub','pig','hbase','sqoop',
+            'zookeeper','metastore','spark','oozie','indexer','search']
+
+        for k, v in get_states().items():
+            if "joined" in k:
+                relname = k.split('.')[0]
+                if 'hive' in relname:
+                    disabled_services.remove('beeswax')
+                    disabled_services.remove('metastore')
+                if 'spark' in relname:
+                    disabled_services.remove('spark')
+                if 'oozie' in relname:
+                    disabled_services.remove('oozie')
+                if 'zookeeper' in relname:
+                    disabled_services.remove('zookeeper')
+
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
+        services_string = ','.join(disabled_services)
+        hookenv.log("Disabled apps {}".format(services_string))
+        utils.re_edit_in_place(hue_config, {
+            r'.*app_blacklist=.*': ''.join(('app_blacklist=', services_string))
+            })
+
+        self.check_relations()
 
     def start(self):
         self.stop()
@@ -162,7 +169,7 @@ class Hue(object):
         except:
             return
 
-    def restart(self):
+    def soft_restart(self):
         hookenv.log("Restarting HUE with Supervisor process")
         try:
             utils.run_as('hue', 'pkill', '-9', 'hue')
@@ -171,16 +178,38 @@ class Hue(object):
             self.stop()
             self.start()
 
+    def restart(self):
+        hookenv.log("Restarting HUE")
+        self.stop()
+        self.start()
+
     def configure_hive(self, hostname, port):
-        #hookenv.log("configuring hive connection")
+        hookenv.log("configuring hive connection")
         hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
         utils.re_edit_in_place(hue_config, {
             r'.*hive_server_host *=.*': 'hive_server_host=%s' % hostname,
             r'.*hive_server_port *=.*': 'hive_server_port=%s' % port
             })
-          
+
+    def configure_zookeeper(self, zookeepers):
+        hookenv.log("configuring zookeeper connection")
+        zks_endpoints = []
+        for zk in zookeepers:
+            zks_endpoints.append('{}:{}'.format(zk['host'], zk['port']))
+
+        ensemble = ','.join(zks_endpoints)
+
+        zk_rest_url = "http://{}:{}".format(zookeepers[0]['host'], 
+                                            zookeepers[0]['rest_port'])
+        hue_config = ''.join((self.dist_config.path('hue'), '/desktop/conf/hue.ini'))
+        utils.re_edit_in_place(hue_config, {
+            r'.*host_ports=.*': 'host_ports=%s' % ensemble,
+            r'.*rest_url=.*': 'rest_url=%s' % zk_rest_url,
+            r'.*ensemble=.*': 'ensemble=%s' % ensemble
+            })
+
     def configure_oozie(self):
-        #hookenv.log("configuring oozie connection")
+        hookenv.log("configuring oozie connection")
 
     def configure_spark(self, hostname, port):
         #hookenv.log("configuring spark connection via livy")
@@ -201,9 +230,6 @@ class Hue(object):
 
     def configure_solr(self):
         hookenv.log("configuring solr connection")
-
-    def configure_zookeeper(self):
-        hookenv.log("configuring zookeeper connection")
 
     def configure_aws(self):
         hookenv.log("configuring AWS connection")
